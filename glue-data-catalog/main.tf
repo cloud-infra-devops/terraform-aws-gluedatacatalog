@@ -59,18 +59,18 @@ resource "aws_glue_catalog_database" "this" {
   catalog_id   = var.glue_catalog_id
   location_uri = local.src_s3_uri
   tags         = var.tags
-  # # Iceberg-oriented parameters (placeholders; adjust according to your engine/lake setup)
-  # parameters = {
-  #   classification              = "iceberg"
-  #   "table_type"                = "ICEBERG"
-  #   "iceberg.enabled"           = "true"
-  #   "iceberg.format-version"    = "2"
-  #   "iceberg.compression-codec" = "zstd"
-  #   "iceberg.catalog"           = "glue"
-  #   "iceberg.external.table"    = "true"
-  #   "iceberg.partitions.spec"   = "[]"
-  #   # Add any engine-specific parameters required by your compute layer (Athena/Spark/EMR/LF)
-  # }
+  # Iceberg-oriented parameters (placeholders; adjust according to your engine/lake setup)
+  parameters = {
+    classification              = "iceberg"
+    "table_type"                = "ICEBERG"
+    "iceberg.enabled"           = "true"
+    "iceberg.format-version"    = "2"
+    "iceberg.compression-codec" = "zstd"
+    "iceberg.catalog"           = "glue"
+    "iceberg.external.table"    = "true"
+    "iceberg.partitions.spec"   = "[]"
+    # Add any engine-specific parameters required by your compute layer (Athena/Spark/EMR/LF)
+  }
   dynamic "create_table_default_permission" {
     iterator = create_table_default_permission
     for_each = length(keys(var.glue_catalog_database_create_table_default_permission)) > 0 ? [var.glue_catalog_database_create_table_default_permission] : []

@@ -37,7 +37,7 @@ variable "environment" {
 variable "glue_catalog_db_name" {
   description = "Glue Data Catalog database name."
   type        = string
-  default     = null
+  # default     = null
 }
 
 variable "glue_catalog_db_description" {
@@ -188,7 +188,7 @@ variable "csv_header" {
 variable "glue_crawler_name" {
   description = "Name of the crawler."
   type        = string
-  default     = null
+  # default     = null
 }
 
 variable "glue_crawler_role" {
