@@ -71,7 +71,7 @@ variable "table_description" {
 
 variable "table_type" {
   type    = string
-  default = "ICEBERG"
+  default = "EXTERNAL_TABLE"
 }
 
 variable "iceberg_metadata_location" {
