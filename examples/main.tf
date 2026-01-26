@@ -58,7 +58,7 @@ module "glue_data_catalog" {
 
   tags = {
     environment = "sbx"
-    Project     = "advanced-app"
+    Project     = "aim-data-platform"
     email       = "aws-core-team@duke-energy.com"
     ManagedBy   = "terraform"
   }
