@@ -37,6 +37,7 @@ variable "environment" {
 variable "glue_catalog_db_name" {
   description = "Glue Data Catalog database name."
   type        = string
+  default     = null
 }
 
 variable "glue_catalog_db_description" {
@@ -93,6 +94,7 @@ variable "tables" {
       type = string
     }))
   }))
+  default = {}
 }
 
 variable "table_partitions" {
