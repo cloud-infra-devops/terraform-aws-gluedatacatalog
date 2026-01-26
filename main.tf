@@ -1,6 +1,6 @@
 # Example usage of the Glue Data Catalog module
 module "glue_data_catalog" {
-  source = "./glue_data_catalog"
+  source = "./glue-data-catalog"
 
   glue_catalog_db_name = "duke_glue_catalog_db"
   glue_crawler_name    = "duke_glue_crawler"
