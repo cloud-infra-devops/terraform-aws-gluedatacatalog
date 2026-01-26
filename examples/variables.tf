@@ -1,9 +1,9 @@
 #######################################################
 # other Terraform variables
 #######################################################
-variable "aws_account_id" {
-  type = string
-}
+# variable "aws_account_id" {
+#   type = string
+# }
 
 # variable "environment" {
 #   type = string
@@ -11,6 +11,6 @@ variable "aws_account_id" {
 
 variable "aws_region" {
   type    = string
-  default = "us-east-1"
+  default = "us-west-2"
 }
 

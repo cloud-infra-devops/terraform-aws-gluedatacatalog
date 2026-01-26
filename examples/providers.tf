@@ -1,10 +1,10 @@
 # https://releases.hashicorp.com/terraform-provider-aws/
 terraform {
   cloud {
-    organization = "dukeenergy-corp"
+    organization = "cloud-infra-dev"
     workspaces {
-      name    = "infra-dev-aim-automation-poc"
-      project = "aim-automation-poc"
+      name    = "testing-terraform-aws-modules"
+      project = "AWS-Cloud-IaC"
     }
   }
   required_version = ">= 1.5, < 2.0"

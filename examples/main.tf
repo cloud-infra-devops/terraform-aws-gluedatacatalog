@@ -55,4 +55,11 @@ module "glue_data_catalog" {
 
   # Provide if you want catalog-change alarms and have CloudTrail logs in CWL
   cloudtrail_log_group_name = "" # e.g., "/aws/cloudtrail/organization"
+
+  tags = {
+    environment = "sbx"
+    Project     = "advanced-app"
+    email       = "aws-core-team@duke-energy.com"
+    ManagedBy   = "terraform"
+  }
 }
