@@ -54,6 +54,7 @@ variable "glue_catalog_id" {
 
 variable "glue_catalog_database_create_table_default_permission" {
   description = "(Optional) Creates a set of default permissions on the table for principals."
+  type        = map(string)
   default     = {}
 }
 
@@ -186,16 +187,19 @@ variable "csv_header" {
 #---------------------------------------------------
 variable "glue_crawler_name" {
   description = "Name of the crawler."
-  default     = ""
+  type        = string
+  default     = null
 }
 
 variable "glue_crawler_role" {
   description = "(Required) The IAM role friendly name (including path without leading slash), or ARN of an IAM role, used by the crawler to access other resources."
-  default     = ""
+  type        = string
+  default     = "AWSGlueServiceRoleDefault"
 }
 
 variable "glue_crawler_table_prefix" {
   description = "(Optional) The table prefix used for catalog tables that are created."
+  type        = string
   default     = null
 }
 

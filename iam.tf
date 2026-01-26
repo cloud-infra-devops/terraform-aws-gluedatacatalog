@@ -74,7 +74,7 @@ resource "aws_iam_role_policy_attachment" "crawler" {
 */
 
 resource "aws_iam_role" "glue_role" {
-  name               = "AWSGlueServiceRoleDefault"
+  name               = var.glue_crawler_role
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",

@@ -4,8 +4,7 @@ module "glue_data_catalog" {
 
   glue_catalog_db_name = "duke_glue_catalog_db"
   glue_crawler_name    = "duke_glue_crawler"
-  # auto_import_schema   = false
-  crawler_schedule = "ON_DEMAND"
+  crawler_schedule     = "ON_DEMAND"
   tables = {
     orders = {
       columns = [
