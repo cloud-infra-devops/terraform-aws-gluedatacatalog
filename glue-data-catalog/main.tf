@@ -1,3 +1,15 @@
+resource "aws_kms_key" "glue-cmk-kms" {
+  description             = "KMS key for Glue Data Catalog encryption"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  tags                    = var.tags
+}
+
+resource "aws_kms_alias" "glue-cmk-alias" {
+  name          = "alias/glue-cmk-kms-${var.environment}"
+  target_key_id = aws_kms_key.glue-cmk-kms.key_id
+}
+
 # Create AWS S3 Buckets
 resource "aws_s3_bucket" "s3-duke-gluedatacatalog-src" {
   bucket = "s3-duke-gluedatacatalog-src" # Replace with a globally unique name
@@ -50,6 +62,25 @@ resource "aws_s3_bucket_public_access_block" "public_access_block_dst" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "src_s3_sse" {
+  bucket = aws_s3_bucket.s3-duke-gluedatacatalog-src.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.glue-cmk-kms.arn
+    }
+  }
+}
+resource "aws_s3_bucket_server_side_encryption_configuration" "dst_s3_sse" {
+  bucket = aws_s3_bucket.s3-duke-gluedatacatalog-dst.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.glue-cmk-kms.arn
+    }
+  }
 }
 
 # Glue Catalog Database
@@ -241,12 +272,14 @@ resource "aws_glue_trigger" "glue_trigger" {
 # CloudWatch Log Groups for crawler and catalog
 resource "aws_cloudwatch_log_group" "glue_crawler" {
   name              = "/aws-glue/crawlers/${aws_glue_crawler.this.name}"
+  kms_key_id        = aws_kms_key.glue-cmk-kms.arn
   retention_in_days = local.log_retention_in_days
   tags              = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "glue_catalog" {
   name              = "/aws-glue/datacatalog/${aws_glue_catalog_database.this.name}"
+  kms_key_id        = aws_kms_key.glue-cmk-kms.arn
   retention_in_days = local.log_retention_in_days
   tags              = var.tags
 }
