@@ -1,3 +1,6 @@
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
 locals {
   src_bucket_name       = aws_s3_bucket.s3-duke-gluedatacatalog-src.bucket
   src_s3_uri            = "s3://${local.src_bucket_name}/${var.src_s3_prefix}"

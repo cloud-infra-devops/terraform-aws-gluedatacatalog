@@ -30,7 +30,7 @@ resource "aws_kms_key" "glue-cmk-kms" {
         Resource = "*"
         Condition = {
           ArnEquals = {
-            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"
           }
         }
       }
@@ -38,9 +38,6 @@ resource "aws_kms_key" "glue-cmk-kms" {
   })
   tags = var.tags
 }
-
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
 
 resource "aws_kms_alias" "glue-cmk-alias" {
   name          = "alias/glue-cmk-kms-${var.environment}"
