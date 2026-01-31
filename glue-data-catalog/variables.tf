@@ -25,6 +25,10 @@ variable "dst_s3_prefix" {
   default     = "iceberg"
 }
 
+variable "bucket_version_enabled" {
+  type = bool
+}
+
 variable "environment" {
   description = "Environment name (e.g., dev, staging, prod)."
   type        = string

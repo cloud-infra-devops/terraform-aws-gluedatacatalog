@@ -70,13 +70,13 @@ resource "aws_s3_object" "dst_s3_directory" {
 resource "aws_s3_bucket_versioning" "source" {
   bucket = aws_s3_bucket.s3-duke-gluedatacatalog-src.bucket
   versioning_configuration {
-    status = "Enabled"
+    status = var.bucket_version_enabled ? "Enabled" : "Disabled"
   }
 }
 resource "aws_s3_bucket_versioning" "destination" {
   bucket = aws_s3_bucket.s3-duke-gluedatacatalog-dst.bucket
   versioning_configuration {
-    status = "Enabled"
+    status = var.bucket_version_enabled ? "Enabled" : "Disabled"
   }
 }
 
