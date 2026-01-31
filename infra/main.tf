@@ -50,8 +50,8 @@ module "glue_data_catalog" {
     Grouping = { TableGroupingPolicy = "CombineCompatibleSchemas" }
   }
 
-  bucket_version_enabled = false
-  alarm_actions          = [] # e.g., ["arn:aws:sns:us-east-1:123456789012:alerts"]
+  # bucket_version_enabled = false
+  alarm_actions = [] # e.g., ["arn:aws:sns:us-east-1:123456789012:alerts"]
 
   # Provide if you want catalog-change alarms and have CloudTrail logs in CWL
   cloudtrail_log_group_name = "" # e.g., "/aws/cloudtrail/organization"
