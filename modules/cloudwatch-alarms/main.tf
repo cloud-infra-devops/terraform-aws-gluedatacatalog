@@ -1,6 +1,6 @@
 resource "aws_cloudwatch_metric_alarm" "this" {
-  for_each            = { for alarm in var.alarms : alarm.name => alarm }
-  count               = each.value.count != null ? each.value.count : 1
+  for_each = { for alarm in var.alarms : alarm.name => alarm }
+  # count               = each.value.count != null ? each.value.count : 1
   alarm_name          = each.value.name
   alarm_description   = each.value.description
   comparison_operator = each.value.comparison_operator
