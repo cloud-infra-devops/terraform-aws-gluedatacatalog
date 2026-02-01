@@ -115,8 +115,6 @@ resource "aws_iam_role_policy" "glue_policy" {
      "Resource": [
      "${aws_s3_bucket.duke_src_s3.arn}",
      "${aws_s3_bucket.duke_src_s3.arn}/*"
-    #  "${aws_s3_bucket.duke_dst_s3.arn}",
-    #  "${aws_s3_bucket.duke_dst_s3.arn}/*"
      ]
    },
    {
