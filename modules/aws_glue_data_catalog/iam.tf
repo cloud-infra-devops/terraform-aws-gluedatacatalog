@@ -113,10 +113,10 @@ resource "aws_iam_role_policy" "glue_policy" {
       "s3:GetBucketLocation"
      ],
      "Resource": [
-     "${module.s3-gluedatacatalog-src.s3_bucket_arn}",
-     "${module.s3-gluedatacatalog-src.s3_bucket_arn}/*",
-     "${module.s3-gluedatacatalog-dst.s3_bucket_arn}",
-     "${module.s3-gluedatacatalog-dst.s3_bucket_arn}/*"
+     "${aws_s3_bucket.duke_src_s3.arn}",
+     "${aws_s3_bucket.duke_src_s3.arn}/*"
+    #  "${aws_s3_bucket.duke_dst_s3.arn}",
+    #  "${aws_s3_bucket.duke_dst_s3.arn}/*"
      ]
    },
    {

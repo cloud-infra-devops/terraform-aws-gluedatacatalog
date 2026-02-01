@@ -1,10 +1,10 @@
 output "source_bucket_name" {
-  value       = module.s3-gluedatacatalog-src.s3_bucket_name
+  value       = aws_s3_bucket.duke_src_s3.bucket
   description = "Name of the created source bucket."
 }
 
 output "source_bucket_arn" {
-  value       = module.s3-gluedatacatalog-src.s3_bucket_arn
+  value       = aws_s3_bucket.duke_src_s3.arn
   description = "Name of the created source bucket."
 }
 

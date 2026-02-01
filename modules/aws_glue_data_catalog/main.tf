@@ -330,14 +330,14 @@ resource "aws_glue_trigger" "glue_trigger" {
 # CloudWatch Log Groups for crawler and catalog
 resource "aws_cloudwatch_log_group" "glue_crawler" {
   name              = "/aws-glue/crawlers/${aws_glue_crawler.this.name}"
-  kms_key_id        = aws_kms_key.glue-cmk-kms.key_arn
+  kms_key_id        = aws_kms_key.glue-cmk-kms.arn
   retention_in_days = local.log_retention_in_days
   tags              = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "glue_catalog" {
   name              = "/aws-glue/datacatalog/${aws_glue_catalog_database.this.name}"
-  kms_key_id        = aws_kms_key.glue-cmk-kms.key_arn
+  kms_key_id        = aws_kms_key.glue-cmk-kms.arn
   retention_in_days = local.log_retention_in_days
   tags              = var.tags
 }
@@ -345,7 +345,7 @@ resource "aws_cloudwatch_log_group" "glue_catalog" {
 resource "aws_cloudwatch_log_group" "glue_cloudtrail_logs" {
   count             = var.create_glue_cloudtrail_logs && var.cloudtrail_log_group_name != "" ? 1 : 0
   name              = var.cloudtrail_log_group_name
-  kms_key_id        = aws_kms_key.glue-cmk-kms.key_arn
+  kms_key_id        = aws_kms_key.glue-cmk-kms.arn
   retention_in_days = local.log_retention_in_days
   tags              = var.tags
 }
