@@ -1,12 +1,12 @@
 # Example usage of the Glue Data Catalog module
 module "aws_glue_data_catalog" {
 
-  source               = "../modules/aws_glue_data_catalog"
+  source               = "git::https://github.com/das-pra-tik/duke-terraform-modules.git//modules/aws_glue_data_catalog"
   glue_catalog_db_name = "duke_glue_catalog_db"
   catalog_table_name   = "duke_iceberg"
   glue_crawler_name    = "duke_glue_crawler"
+  crawler_schedule     = "ON_DEMAND"
   # auto_import_schema   = true
-  crawler_schedule = "ON_DEMAND"
   # tables = {
   #   orders = {
   #     columns = [

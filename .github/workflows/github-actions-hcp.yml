@@ -42,11 +42,7 @@ jobs:
     strategy:
       matrix:
         folder:
-          [
-            "infra",
-            "modules/cloudwatch-alarms",
-            "modules/aws_glue_data_catalog",
-          ]
+          ["infra"]
     env:
       tfcode_path: "./${{ matrix.folder }}"
     defaults:
