@@ -10,7 +10,7 @@ variable "tags" {
 variable "name_prefix" {
   description = "Prefix for resource names."
   type        = string
-  default     = "duke-ima"
+  default     = "duke"
 }
 
 variable "src_s3_prefix" {
@@ -19,15 +19,15 @@ variable "src_s3_prefix" {
   default     = "src_data"
 }
 
-variable "dst_s3_prefix" {
-  description = "Prefix (folder) inside the destination bucket where data is stored."
-  type        = string
-  default     = "iceberg"
-}
-
-# variable "bucket_version_enabled" {
-#   type = bool
+# variable "dst_s3_prefix" {
+#   description = "Prefix (folder) inside the destination bucket where data is stored."
+#   type        = string
+#   default     = "iceberg"
 # }
+
+variable "s3_bucket_versioning" {
+  type = bool
+}
 
 variable "environment" {
   description = "Environment name (e.g., dev, staging, prod)."
@@ -41,7 +41,6 @@ variable "environment" {
 variable "glue_catalog_db_name" {
   description = "Glue Data Catalog database name."
   type        = string
-  # default     = null
 }
 
 variable "glue_catalog_db_description" {
@@ -68,6 +67,12 @@ variable "glue_catalog_database_create_table_default_permission" {
 #   default     = true
 # }
 
+variable "catalog_table_name" {
+  type        = string
+  description = "Name of the table."
+  default     = null
+}
+
 variable "table_description" {
   type    = string
   default = "Iceberg table"
@@ -85,22 +90,26 @@ variable "iceberg_metadata_location" {
 
 }
 
-variable "table_parameters" {
-  type        = map(string)
-  default     = {}
-  description = "Additional Glue table parameters (must NOT include table_type or metadata_location for Iceberg)."
-}
+# variable "table_parameters" {
+#   type        = map(string)
+#   description = "Additional Glue table parameters (must NOT include table_type or metadata_location for Iceberg)."
+#   default = {
+#     "table_type"                = "ICEBERG"
+#     "metadata_location"         = "${local.src_s3_uri}/metadata"
+#     "write.format.default"      = "parquet"
+#     "write.parquet.compression" = "snappy"
+#   }
+# }
 
-variable "tables" {
-  description = "Map of Iceberg tables with their column definitions"
-  type = map(object({
-    columns = list(object({
-      name = string
-      type = string
-    }))
-  }))
-  default = {}
-}
+# variable "tables" {
+#   description = "Map of Iceberg tables with their column definitions"
+#   type = map(object({
+#     columns = list(object({
+#       name = string
+#       type = string
+#     }))
+#   }))
+# }
 
 variable "table_partitions" {
   type    = list(object({ name = string, type = string }))
@@ -192,10 +201,10 @@ variable "csv_header" {
 variable "glue_crawler_name" {
   description = "Name of the crawler."
   type        = string
-  # default     = null
+  default     = null
 }
 
-variable "glue_crawler_role" {
+variable "glue_crawler_role_name" {
   description = "(Required) The IAM role friendly name (including path without leading slash), or ARN of an IAM role, used by the crawler to access other resources."
   type        = string
   default     = "AWSGlueServiceRoleDefault"
@@ -269,16 +278,16 @@ variable "crawler_configuration" {
   }
 }
 
-variable "crawler_sample_size" {
-  type    = number
-  default = 1
-}
+# variable "crawler_sample_size" {
+#   type    = number
+#   default = 1
+# }
 
-variable "crawler_event_queue_arn" {
-  type        = string
-  default     = null
-  description = "Optional SQS event queue ARN for crawler notifications."
-}
+# variable "crawler_event_queue_arn" {
+#   type        = string
+#   default     = null
+#   description = "Optional SQS event queue ARN for crawler notifications."
+# }
 
 #---------------------------------------------------
 # Cloudwatch Logs and Alarms
@@ -286,6 +295,12 @@ variable "crawler_event_queue_arn" {
 variable "cw_log_retention_in_days" {
   type    = number
   default = 5
+}
+
+variable "enable_cw_alarms" {
+  description = "Enable default postgresql CloudWatch metrics/alarms."
+  type        = bool
+  default     = true
 }
 
 variable "time_running_threshold_seconds" {
@@ -311,144 +326,11 @@ variable "alarm_actions" {
   default     = []
 }
 
+variable "create_glue_cloudtrail_logs" {
+  type = bool
+}
+
 variable "cloudtrail_log_group_name" {
   description = "Optional CloudTrail log group name to watch for Glue Data Catalog delete/update events. If empty, catalog alarms are skipped."
   type        = string
-  default     = ""
 }
-
-# variable "project_name" {
-#   description = "A short name used for tagging and bucket naming."
-#   type        = string
-#   default     = "data-product"
-# }
-
-# variable "glue_crawler_description" {
-#   description = "(Optional) Description of the crawler."
-#   default     = null
-# }
-
-# variable "glue_crawler_classifiers" {
-#   description = "(Optional) List of custom classifiers. By default, all AWS classifiers are included in a crawl, but these custom classifiers always override the default classifiers for a given classification."
-#   default     = null
-# }
-
-# variable "glue_crawler_configuration" {
-#   description = "(Optional) JSON string of configuration information."
-#   default     = null
-# }
-
-# variable "glue_crawler_schedule" {
-#   description = "(Optional) A cron expression used to specify the schedule. For more information, see Time-Based Schedules for Jobs and Crawlers. For example, to run something every day at 12:15 UTC, you would specify: cron(15 12 * * ? *)."
-#   default     = null
-# }
-
-# variable "glue_crawler_delta_target" {
-#   description = "(Optional) List of nested Delta Lake target arguments"
-#   default     = []
-# }
-
-# variable "glue_crawler_iceberg_target" {
-#   description = "(Optional) List nested Iceberg target arguments."
-#   default     = []
-# }
-
-# variable "glue_crawler_lake_formation_configuration" {
-#   description = "(Optional) Specifies Lake Formation configuration settings for the crawler."
-#   default     = []
-# }
-
-# variable "glue_crawler_dynamodb_target" {
-#   description = "(Optional) List of nested DynamoDB target arguments."
-#   default     = []
-# }
-
-# variable "glue_crawler_jdbc_target" {
-#   description = "(Optional) List of nested JBDC target arguments. "
-#   default     = []
-# }
-
-# variable "glue_crawler_s3_target" {
-#   description = "(Optional) List nested Amazon S3 target arguments."
-#   default     = []
-# }
-
-# variable "glue_crawler_catalog_target" {
-#   description = "(Optional) List nested Amazon catalog target arguments."
-#   default     = []
-# }
-
-# variable "glue_crawler_schema_change_policy" {
-#   description = "(Optional) Policy for the crawler's update and deletion behavior."
-#   default     = []
-# }
-
-# variable "glue_crawler_recrawl_policy" {
-#   description = "Optional) A policy that specifies whether to crawl the entire dataset again, or to crawl only folders that were added since the last crawler run."
-#   default     = []
-# }
-
-# variable "glue_crawler_mongodb_target" {
-#   description = "(Optional) List nested MongoDB target arguments."
-#   default     = []
-# }
-
-# variable "glue_crawler_lineage_configuration" {
-#   description = "(Optional) Specifies data lineage configuration settings for the crawler."
-#   default     = []
-# }
-
-# variable "enable_glue_security_configuration" {
-#   description = "Enable glue security configuration usage"
-#   default     = false
-# }
-
-# variable "glue_crawler_security_configuration" {
-#   description = "(Optional) The name of Security Configuration to be used by the crawler"
-#   default     = null
-# }
-
-# variable "glue_catalog_database_target_database" {
-#   description = "(Optional) Configuration block for a target database for resource linking."
-#   default     = {}
-# }
-
-# variable "classifiers" {
-#   description = <<EOF
-# Enable/disable built-in classifiers.
-# - grok
-# - xml
-# - json
-# - csv
-# EOF
-#   type = object({
-#     grok = bool
-#     xml  = bool
-#     json = bool
-#     csv  = bool
-#   })
-#   default = {
-#     grok = true
-#     xml  = true
-#     json = true
-#     csv  = true
-#   }
-# }
-
-# variable "table_name" {
-#   type    = string
-#   default = "iceberg_table"
-# }
-# variable "table_parameters" {
-#   type    = map(string)
-#   default = {}
-# }
-
-# variable "table_columns" {
-#   type = list(object({
-#     name    = string
-#     type    = string
-#     comment = optional(string)
-#   }))
-#   default = []
-# }

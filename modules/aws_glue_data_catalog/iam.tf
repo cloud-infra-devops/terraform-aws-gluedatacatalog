@@ -74,7 +74,7 @@ resource "aws_iam_role_policy_attachment" "crawler" {
 */
 
 resource "aws_iam_role" "glue_role" {
-  name               = var.glue_crawler_role
+  name               = var.glue_crawler_role_name
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -107,23 +107,49 @@ resource "aws_iam_role_policy" "glue_policy" {
    {
      "Effect": "Allow",
      "Action": [
-       "s3:*"
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
      ],
-     "Resource": ["*"]
+     "Resource": [
+     "${module.s3-gluedatacatalog-src.s3_bucket_arn}",
+     "${module.s3-gluedatacatalog-src.s3_bucket_arn}/*",
+     "${module.s3-gluedatacatalog-dst.s3_bucket_arn}",
+     "${module.s3-gluedatacatalog-dst.s3_bucket_arn}/*"
+     ]
    },
    {
      "Effect": "Allow",
      "Action": [
        "logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"
      ],
-     "Resource": ["arn:aws:logs:*:*:*"]
+     "Resource": ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"]
    },
+   {
+  "Effect": "Allow",
+  "Action": [
+    "kms:Encrypt",
+    "kms:ReEncrypt*",
+    "kms:Decrypt",
+    "kms:GenerateDataKey*",
+    "kms:Describe*"
+  ],
+  "Resource": ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"],
+  "Condition": {
+    "StringEquals": {
+      "kms:ViaService": [
+        "logs.${data.aws_region.current.name}.amazonaws.com"
+      ]
+    }
+  }
+},
    {
      "Effect": "Allow",
      "Action": [
        "cloudwatch:PutMetricData"
      ],
-     "Resource": ["*"]
+     "Resource": ["arn:aws:cloudwatch:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:alarm:*"]
    }
  ]
 }

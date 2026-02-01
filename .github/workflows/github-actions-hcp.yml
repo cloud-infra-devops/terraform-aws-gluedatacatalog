@@ -17,7 +17,7 @@
 # This workflow will create AWS resource using HCP Terraform from GitHub Actions
 # It is reusable workflow that can be called in other workflows
 
-name: AWS Infra Creation Using in HCP Terraform
+name: AWS Infra Creation in HCP Terraform using GitHub Actions
 run-name: ${{ github.actor }} has triggered the pipeline
 on:
   workflow_call:
@@ -41,7 +41,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        folder: ["infra", "glue-data-catalog"]
+        folder:
+          [
+            "infra",
+            "modules/cloudwatch-alarms",
+            "modules/aws_glue_data_catalog",
+          ]
     env:
       tfcode_path: "./${{ matrix.folder }}"
     defaults:
@@ -58,12 +63,11 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
           terraform_version: 1.14.4
 
-      # Add the AWS Creds as ENV variable in HCP workspace, since the tf run happens in HCP environment
       # Run a terraform fmt
       - name: Terraform Format
         id: fmt
         run: |
-          terraform fmt -check
+          terraform fmt --recursive -check
         continue-on-error: true
 
       - name: Go to target directory
@@ -77,14 +81,14 @@ jobs:
         run: |
           terraform init
         continue-on-error: true
-    
+
       # Run a terraform validate
       - name: Terraform Validate
         id: validate
         if: matrix.folder == 'infra'
         run: |
           terraform validate -no-color
-    
+
       - name: Run Trivy vulnerability scanner in config mode
         uses: aquasecurity/trivy-action@master
         with:
@@ -103,7 +107,7 @@ jobs:
       #     echo `pwd`
       #     echo "** Running Terraform Init **"
       #     terraform init
-            
+
       #     echo "** Running Terraform Validate **"
       #     terraform validate
       #   working-directory: ${{ env.tfcode_path }}
@@ -161,16 +165,16 @@ jobs:
       - name: Go to target directory
         run: |
           cd ${{ matrix.folder }}/
-  
-    # Run a terraform init
+
+      # Run a terraform init
       - name: Terraform Init
         id: init
         if: matrix.folder == 'infra'
         run: |
           terraform init
         continue-on-error: true
-      
-    # Run a terraform validate
+
+      # Run a terraform validate
       - name: Terraform Validate
         id: validate
         if: matrix.folder == 'infra'
@@ -183,11 +187,9 @@ jobs:
       #     echo `pwd`
       #     echo "** Running Terraform Init **"
       #     terraform init
-
       #     echo "** Running Terraform Validate **"
       #     terraform validate
       #   working-directory: ${{ env.tfcode_path }}
-
       - name: Terraform Apply
         if: matrix.folder == 'infra'
         run: echo "** Running Terraform Apply **"; terraform apply -auto-approve

@@ -2,11 +2,11 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 locals {
-  src_bucket_name       = aws_s3_bucket.s3-duke-gluedatacatalog-src.bucket
-  src_s3_uri            = "s3://${local.src_bucket_name}/${var.src_s3_prefix}"
-  dst_bucket_name       = aws_s3_bucket.s3-duke-gluedatacatalog-dst.bucket
-  dst_s3_uri            = "s3://${local.dst_bucket_name}/${var.dst_s3_prefix}"
+  src_bucket_name       = aws_s3_bucket.duke_src_s3.id
+  src_s3_uri            = "s3://${aws_s3_bucket.duke_src_s3.id}/${var.src_s3_prefix}"
   log_retention_in_days = var.cw_log_retention_in_days != null ? var.cw_log_retention_in_days : null
+  # dst_bucket_name       = aws_s3_bucket.duke_dst_s3.id
+  # dst_s3_uri            = "s3://${aws_s3_bucket.duke_dst_s3.id}/${var.dst_s3_prefix}"
   # crawler_targets = [
   #   {
   #     path = "s3://${module.s3-gluedatacatalog-src.s3_bucket_name}"
@@ -28,4 +28,5 @@ locals {
     json = var.enable_json_classifier
     csv  = var.enable_csv_classifier
   }
+  create_cw_alarms = var.enable_cw_alarms ? 1 : 0
 }
