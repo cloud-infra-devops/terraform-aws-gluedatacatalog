@@ -27,9 +27,6 @@
 #   region               = "us-east-1"
 # }
 
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
-
 resource "aws_kms_key" "glue-cmk-kms" {
   description             = "KMS key for Glue Data Catalog encryption-${var.environment}-${data.aws_caller_identity.current.account_id}"
   deletion_window_in_days = 7
