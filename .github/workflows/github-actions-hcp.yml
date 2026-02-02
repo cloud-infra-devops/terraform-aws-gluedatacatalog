@@ -36,18 +36,40 @@ env:
   tfc_workspace: "testing-terraform-aws-modules"
 
 jobs:
+  find_root_folder:
+    name: Find Root Folder containing .terraform/modules
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Checkout tf code in runner environment
+        uses: actions/checkout@v6.0.2
+
+      - name: Find root folder containing .terraform/modules
+        id: set-matrix
+        run: |
+          folders=$(find . -path "*/.terraform/modules/*" -type d | sed 's|/.terraform/modules||' | sed 's|^./||' | sort -u)
+          matrix="["
+          first=true
+          for folder in $folders; do
+            if [ "$first" = true ]; then
+              matrix="$matrix\"$folder\""
+              first=false
+            else
+              matrix="$matrix,\"$folder\""
+            fi
+          done
+          matrix="$matrix]"
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+          echo "Found folders: $matrix"
+
   trivy_code_scan:
     name: Trivy-IaC-Code-Scan
     runs-on: ubuntu-latest
+    needs: find_root_folder
     strategy:
       matrix:
-        folder:
-          ["infra"]
-    env:
-      tfcode_path: "./${{ matrix.folder }}"
-    defaults:
-      run:
-        shell: bash
+        folder: ${{ fromJson(needs.find_root_folder.outputs.matrix) }}
     steps:
       - name: Checkout tf code in runner environment
         uses: actions/checkout@v6.0.2
@@ -59,30 +81,21 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
           terraform_version: 1.14.4
 
-      # Run a terraform fmt
       - name: Terraform Format
-        id: fmt
         run: |
+          cd ${{ matrix.folder }}
           terraform fmt --recursive -check
         continue-on-error: true
 
-      - name: Go to target directory
-        run: |
-          cd ${{ matrix.folder }}/
-
-      # Run a terraform init
       - name: Terraform Init
-        id: init
-        if: matrix.folder == 'infra'
         run: |
+          cd ${{ matrix.folder }}
           terraform init
         continue-on-error: true
 
-      # Run a terraform validate
       - name: Terraform Validate
-        id: validate
-        if: matrix.folder == 'infra'
         run: |
+          cd ${{ matrix.folder }}
           terraform validate -no-color
 
       - name: Run Trivy vulnerability scanner in config mode
@@ -91,7 +104,6 @@ jobs:
           scan-type: "config"
           ignore-unfixed: true
           scan-ref: "${{ matrix.folder }}/"
-          # trivy-config: "trivy.yaml"
           format: "table"
           scanners: "vuln,secret,misconfig"
           severity: "CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN"
@@ -138,17 +150,12 @@ jobs:
 
   # Once the user verifies the Terraform Plan, the user can run the Terraform Apply and Destroy commands
   apply_terraform_plan:
-    needs: trivy_code_scan
+    needs: [find_root_folder, trivy_code_scan]
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        folder: ["infra"]
-    env:
-      tfcode_path: "./${{ matrix.folder }}"
-    defaults:
-      run:
-        shell: bash
+        folder: ${{ fromJson(needs.find_root_folder.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
@@ -158,35 +165,19 @@ jobs:
           cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
           terraform_version: 1.14.4
 
-      - name: Go to target directory
-        run: |
-          cd ${{ matrix.folder }}/
-
-      # Run a terraform init
       - name: Terraform Init
-        id: init
-        if: matrix.folder == 'infra'
         run: |
+          cd ${{ matrix.folder }}
           terraform init
         continue-on-error: true
 
-      # Run a terraform validate
       - name: Terraform Validate
-        id: validate
-        if: matrix.folder == 'infra'
         run: |
+          cd ${{ matrix.folder }}
           terraform validate -no-color
 
-      # # Invoke the Terraform commands
-      # - name: Terraform init and validate
-      #   run: |
-      #     echo `pwd`
-      #     echo "** Running Terraform Init **"
-      #     terraform init
-      #     echo "** Running Terraform Validate **"
-      #     terraform validate
-      #   working-directory: ${{ env.tfcode_path }}
       - name: Terraform Apply
-        if: matrix.folder == 'infra'
-        run: echo "** Running Terraform Apply **"; terraform apply -auto-approve
-        # working-directory: ${{ env.tfcode_path }}
+        run: |
+          cd ${{ matrix.folder }}
+          echo "** Running Terraform Apply **"
+          terraform apply -auto-approve

@@ -1,6 +1,5 @@
 # Example usage of the Glue Data Catalog module
 module "aws_glue_data_catalog" {
-
   source               = "git::https://github.com/das-pra-tik/duke-terraform-modules.git//modules/aws_glue_data_catalog"
   glue_catalog_db_name = "duke_glue_catalog_db"
   catalog_table_name   = "duke_iceberg"
