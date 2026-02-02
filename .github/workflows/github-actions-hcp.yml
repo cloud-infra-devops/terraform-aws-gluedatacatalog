@@ -48,7 +48,7 @@ jobs:
       - name: Find root folder containing .terraform/modules
         id: set-matrix
         run: |
-          folders=$(find . -path "*/.terraform/modules/*" -type d | sed 's|/.terraform/modules||' | sed 's|^./||' | sort -u)
+          folders=$(find . -path "*/.terraform/modules" -type d | sed 's|/.terraform/modules||' | sed 's|^./||' | sort -u)
           matrix="["
           first=true
           for folder in $folders; do
